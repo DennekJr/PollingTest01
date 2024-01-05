@@ -7,7 +7,7 @@ namespace PollingSystemTest_01.Models
 	{
 		public int Id { get; set; }
 		public int VoteCount { get; set; } = 0;
-		public int CorrectVoteCount { get; set; } = 0;
+		public bool disPlayPercentage { get; set; } = false;
 
 		public string Name { get; set; }
 		public string Description { get; set; }

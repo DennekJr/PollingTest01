@@ -7,9 +7,10 @@ namespace PollingSystemTest_01.Models
 	{
         public int Id { get; set; }
 
-        public int PollQuestionId { get; set; }
-        public bool PollOptionIsCorrect { get; set; } = false;
+        public bool MostVoted { get; set; } = false;
+        public int PollOptionVoteCount { get; set; }
 
+        public int PollQuestionId { get; set; }
         public PollQuestion PollQuestionToAnswer { get; set; }
 
         public string UserId { get; set; }

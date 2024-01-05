@@ -9,6 +9,7 @@ namespace PollingSystemTest_01.Models
 	{
 		public ICollection<PollQuestion>? Questions { get; set; } = null!;
 		public ICollection<PollOption> Options { get; set; } = null!;
+		public ICollection<Vote> Votes { get; set; } = null!;
 		public int CorrectOptionCount { get; set; } = 0;
 
 		public string? Role { get; set; }
@@ -17,6 +18,7 @@ namespace PollingSystemTest_01.Models
 		{
 			Questions = new HashSet<PollQuestion>();
 			Options = new HashSet<PollOption>();
+			Votes = new HashSet<Vote>();
 		}
 	}
 }
