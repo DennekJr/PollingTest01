@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc;
 
 namespace PollingSystemTest_01.Models
 {
@@ -17,7 +19,7 @@ namespace PollingSystemTest_01.Models
 		public virtual ICollection<Vote>? Votes { get; set; }
 		public virtual ICollection<UsersSelected> UsersSelected { get; set; }
 
-		public DateTime DOC { get; set; }
+		public string DOC { get; set; }
 
 		public string? UserId { get; set; }
 		public PollQuestion()

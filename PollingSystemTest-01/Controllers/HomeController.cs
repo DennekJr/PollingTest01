@@ -114,25 +114,23 @@ namespace PollingSystemTest_01.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        public IActionResult CreateRole()
+        public IActionResult AssignRole()
         {
             return View();
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateRole(string newRoleName)
+        public async Task<IActionResult> AssignRole(string email, string roleAssigned)
         {
-            await _roleManager.CreateAsync(new IdentityRole(newRoleName));
+            await _roleManager.CreateAsync(new IdentityRole(roleAssigned));
 
-
-            string currentUser = User.Identity.Name;
-            ApplicationUser user = await _userManager.FindByNameAsync(currentUser);
-            if (await _roleManager.RoleExistsAsync(newRoleName))
+            ApplicationUser user = await _userManager.FindByNameAsync(email);
+            if (await _roleManager.RoleExistsAsync(roleAssigned))
             {
-                if (!await _userManager.IsInRoleAsync(user, newRoleName))
+                if (!await _userManager.IsInRoleAsync(user, roleAssigned))
                 {
-                    await _userManager.AddToRoleAsync(user, newRoleName);
-                    user.Role = newRoleName;
+                    await _userManager.AddToRoleAsync(user, roleAssigned);
+                    user.Role = roleAssigned;
                     db.SaveChanges();
                 }
 
@@ -143,16 +141,9 @@ namespace PollingSystemTest_01.Controllers
             return View();
         }
 
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public IActionResult CreateQuestion()
         {
-            var users = new List<string>();
-            foreach (var user in db.Users)
-            {
-                users.Add(user.Email);
-            }
-
-            var usersList = new SelectList(users, "Email", "Email");
             ViewBag.users = db.Users;
             return View();
         }
@@ -177,14 +168,15 @@ namespace PollingSystemTest_01.Controllers
                     newQuestion.PollOptions.Add(Option2);
                     newQuestion.PollOptions.Add(Option3);
                     newQuestion.PollOptions.Add(Option4);
+                    DateTime date = DateTime.Now;
+                    string formattedDateTime = date.ToString("dddd, dd MMMM yyyy HH:mm");
+                    newQuestion.DOC = formattedDateTime;
                     foreach(var userEmail in users)
                     {
                         UsersSelected userSelected = new UsersSelected { UserEmail = userEmail, PollQuestionId = newQuestion.Id };
                         newQuestion.UsersSelected.Add(userSelected);
                         db.UsersSelected.Add(userSelected);
                         user.UsersSelected.Add(userSelected);
-                        Console.WriteLine("Email");
-                        Console.WriteLine(userEmail);
                     }
                     db.Questions.Add(newQuestion);
                     db.Options.Add(Option1);
@@ -249,6 +241,7 @@ namespace PollingSystemTest_01.Controllers
             return View();
         }
 
+        [HttpPost]
         public IActionResult VoteOption(int? VOId)
         {
             string UserMail = User.Identity.Name;

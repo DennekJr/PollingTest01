@@ -2,9 +2,16 @@
 @{
     ViewData["Title"] = "Home Page";
 }
+<div style="display:flex">
+    @if (@User.IsInRole("Admin") == true)
+    {
+        <h4 style="padding-right: 1rem; font-style: italic"><a class="text-dark" asp-area="" asp-controller="Home" asp-action="CreateQuestion">Create Poll</a></h4>
 
-<a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="CreateQuestion">Create Question</a>
+        <h4 style="font-style: italic"><a class="text-dark" asp-area="" asp-controller="Home" asp-action="AssignRole">Assign Role</a></h4>
+}
+</div>
 
+<h1>Current Polls</h1>
 <table class="table">
     <thead>
         <tr>
@@ -15,13 +22,7 @@
                 @Html.DisplayNameFor(model => model.Description)
             </th>
             <td>
-                @Html.DisplayNameFor(model => model.DOC)
-            </td>
-            <td>
-                Options Count
-            </td>
-            <td>
-                Poll Options
+                Date Created 
             </td>
             <td></td>
             <td></td>
@@ -41,19 +42,7 @@
                     @Html.DisplayFor(modelItem => item.DOC)
                 </td>
                 <td>
-                    @item.PollOptions.Where(x => x.Description != null).Count()
-                </td>
-                <td style="display:flex; flex-direction: column">
-                    @if (@item.PollOptions != null)
-                    {
-                        @foreach (var t in @item.PollOptions)
-                        {
-                            <a asp-action="QuestionsWithTag" asp-route-TagId="@t.Id">@t.Description</a>
-                        }
-                    }
-                </td>
-                <td>
-                    <a asp-action="QuestionsDetail" asp-route-qId="@item.Id">Details</a>
+                    <a asp-action="QuestionsDetail" asp-route-qId="@item.Id">Take Poll</a>
                 </td>
                 <td>
                     @if (ViewBag.role != null)
@@ -74,14 +63,9 @@
                 </td>
             </tr>
         }
-        <tr>
-            <th>
-                @Html.ActionLink("Date Created", "Index", new { sortOrder = ViewBag.DateSortParm })
-            </th>
-            <th>
-                @Html.ActionLink("Most Answered", "Index", new { sortOrder = ViewBag.MostAnsweredSortParm })
-            </th>
-            <th></th>
-        </tr>
     </tbody>
 </table>
+<div>
+    <span>Sort By:</span>
+    <span>@Html.ActionLink("Date Created", "Index", new { sortOrder = ViewBag.DateSortParm })</span>
+</div>

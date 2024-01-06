@@ -64,10 +64,13 @@
                 {
 
                     <form asp-action="QuestionDetail" method="post">
-                        <li>@t.Description</li>
                         @if (ViewBag.userId != @t.UserId)
                         {
-                            <li><a asp-action="VoteOption" asp-route-VOId="@t.Id">Vote</a></li>
+                            <li>@t.Description - <a asp-action="VoteOption" asp-route-VOId="@t.Id">Vote</a></li>
+                        }
+                        else
+                        {
+                            <li>@t.Description</li>
                         }
                     </form>
                 }
