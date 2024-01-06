@@ -8,29 +8,33 @@
         <h4 style="padding-right: 1rem; font-style: italic"><a class="text-dark" asp-area="" asp-controller="Home" asp-action="CreateQuestion">Create Poll</a></h4>
 
         <h4 style="font-style: italic"><a class="text-dark" asp-area="" asp-controller="Home" asp-action="AssignRole">Assign Role</a></h4>
-}
+    }
 </div>
 
 <h1>Current Polls</h1>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Description)
-            </th>
-            <td>
-                Date Created 
-            </td>
-            <td></td>
-            <td></td>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
+@if (@Model.Count() > 0)
+    {
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Name)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Description)
+                </th>
+                <td>
+                    Date Created
+                </td>
+                <td></td>
+                <td></td>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+                {
+                    @*if (item.UsersSelected.FirstOrDefault(x => x.UserEmail == @ViewBag.CurrentUser) != null)
+                    {*@
             <tr>
                 <td>
                     @Html.DisplayFor(modelItem => item.Name)
@@ -46,26 +50,31 @@
                 </td>
                 <td>
                     @if (ViewBag.role != null)
-                    {
+                        {
                         <form asp-action="Index" method="Post">
                             @foreach (var itemRole in ViewBag.role)
-                            {
-                                @if (itemRole == "Admin")
                                 {
+                                @if (itemRole == "Admin")
+                                    {
                                     <button type="submit" asp-route-QId="@item.Id">Delete</button>
+                                    }
                                 }
-                            }
 
                         </form>
-                    }
+                        }
 
 
                 </td>
             </tr>
-        }
-    </tbody>
-</table>
-<div>
-    <span>Sort By:</span>
-    <span>@Html.ActionLink("Date Created", "Index", new { sortOrder = ViewBag.DateSortParm })</span>
-</div>
+            @*}*@
+                }
+        </tbody>
+    </table>
+    <div>
+        <span>Sort By:</span>
+        <span>@Html.ActionLink("Date Created", "Index", new { sortOrder = ViewBag.DateSortParm })</span>
+    </div>
+    }
+    else {
+        <h4>Sorry!, No polls to take at this time.</h4>
+    }

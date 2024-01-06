@@ -40,39 +40,38 @@ namespace PollingSystemTest_01.Controllers
             {
                 string userMail = User.Identity.Name;
                 ApplicationUser user = await _userManager.FindByEmailAsync(userMail);
-                ViewBag.CurrentUSer = user;
+                ViewBag.CurrentUser = user;
                 ViewBag.role = await _userManager.GetRolesAsync(user);
+                ViewBag.DateSortParm = sortOrder == "Date" ? "date_desc" : "Date";
+                var questions = from s in db.Questions.Where(x => x.UsersSelected.FirstOrDefault(u => u.UserEmail == user.Email) != null).Include(q => q.PollOptions).Include(v => v.Votes).Include(u => u.User)
+
+                                select s;
+
+                switch (sortOrder)
+                {
+                    case "name_desc":
+                        questions = questions.OrderByDescending(s => s.Name);
+                        break;
+                    case "Date":
+                        questions = questions.OrderBy(s => s.DOC);
+                        break;
+                    case "date_desc":
+                        questions = questions.OrderByDescending(s => s.DOC);
+                        break;
+                    case "MostA":
+                        questions = questions.OrderByDescending(s => s.PollOptions.Count());
+                        break;
+                    case "LeastA":
+                        questions = questions.OrderByDescending(s => s.PollOptions.Count()).Reverse();
+                        break;
+                    default:
+                        questions = questions.OrderBy(s => s.Description.Length);
+                        break;
+                }
+                return View(questions.ToList());
             }
 
-            ViewBag.NameSortParm = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
-            ViewBag.DateSortParm = sortOrder == "Date" ? "date_desc" : "Date";
-            ViewBag.MostAnsweredSortParm = sortOrder == "MostA" ? "LeastA" : "";
-            // var quest = db.Questions.Include(q => q.Answers).ToList();
-            var questions = from s in db.Questions.Include(q => q.PollOptions).Include(v => v.Votes).Include(u => u.User)
-
-                            select s;
-            switch (sortOrder)
-            {
-                case "name_desc":
-                    questions = questions.OrderByDescending(s => s.Name);
-                    break;
-                case "Date":
-                    questions = questions.OrderBy(s => s.DOC);
-                    break;
-                case "date_desc":
-                    questions = questions.OrderByDescending(s => s.DOC);
-                    break;
-                case "MostA":
-                    questions = questions.OrderByDescending(s => s.PollOptions.Count());
-                    break;
-                case "LeastA":
-                    questions = questions.OrderByDescending(s => s.PollOptions.Count()).Reverse();
-                    break;
-                default:
-                    questions = questions.OrderBy(s => s.Description.Length);
-                    break;
-            }
-            return View(questions.ToList());
+            return View();
         }
 
         [HttpPost]
@@ -207,8 +206,9 @@ namespace PollingSystemTest_01.Controllers
             PollQuestion questionToDetail = db.Questions.Include(x => x.PollOptions).ThenInclude(v => v.Votes).First(x => x.Id == qId);
             string userMail = User.Identity.Name;
             ApplicationUser user = db.Users.First(u => u.UserName == userMail);
+            var largestOptionVote = questionToDetail.PollOptions.Max(x => x.PollOptionVoteCount);
+            ViewBag.largestoptionVoted = largestOptionVote;
             ViewBag.userId = user.Id;
-
             ViewBag.question = questionToDetail;
             return View(questionToDetail);
         }
@@ -221,6 +221,7 @@ namespace PollingSystemTest_01.Controllers
             string userMail = User.Identity.Name;
             ApplicationUser user = db.Users.First(u => u.UserName == userMail);
             ViewBag.userId = user.Id;
+            ViewBag.question = questionToDetail;
             //var Questions = db.Questions.Include(x => x.Tags).Where(x => x.Tags.Contains((Tag)tag));
             try
             {
@@ -237,16 +238,13 @@ namespace PollingSystemTest_01.Controllers
             {
                 return View(ex.Message);
             }
-            ViewBag.question = questionToDetail;
             return View();
         }
 
-        [HttpPost]
         public IActionResult VoteOption(int? VOId)
         {
             string UserMail = User.Identity.Name;
             ApplicationUser user = db.Users.First(u => u.Email == UserMail);
-            // List<Journal> journalsForUser = db.Journals.Where(u->u.Name == email).ToList();
             if (VOId != null)
             {
 
@@ -256,8 +254,25 @@ namespace PollingSystemTest_01.Controllers
                 {
                     Vote newVote = new Vote { Decision = true, User = user, PollOption = option, PollOptionId = option.Id };
                     option.Votes.Add(newVote);
+                    option.PollOptionVoteCount++;
                     questionVotedOn.Votes.Add(newVote);
                     questionVotedOn.VoteCount++;
+                    var mostVotedOption = new PollOption();
+                    var mostVotedOptionCount = 0;
+                    foreach (var pollOption in questionVotedOn.PollOptions)
+                    {
+                        if(pollOption.PollOptionVoteCount > mostVotedOptionCount)
+                        {
+                            mostVotedOptionCount = pollOption.PollOptionVoteCount;
+                            mostVotedOption = pollOption;
+                            mostVotedOption.MostVoted = true;
+                        } else
+                        {
+                            mostVotedOption.MostVoted = false;
+                        }
+                    }
+                    Console.WriteLine("Current Most Voted Option");
+                    Console.WriteLine(mostVotedOption.Description);
                     db.Votes.Add(newVote);
                     user.Votes.Add(newVote);
                 }
