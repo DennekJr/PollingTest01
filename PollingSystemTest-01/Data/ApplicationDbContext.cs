@@ -14,6 +14,7 @@ namespace PollingSystemTest_01.Data
         public DbSet<PollQuestion> Questions { get; set; }
         public DbSet<PollOption> Options { get; set; }
         public DbSet<Vote> Votes { get; set; }
+        public DbSet<UsersSelected> UsersSelected { get; set; }
     }
 }
 

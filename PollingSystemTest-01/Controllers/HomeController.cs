@@ -151,10 +151,6 @@ namespace PollingSystemTest_01.Controllers
             {
                 users.Add(user.Email);
             }
-            foreach(var user in db.Users)
-            {
-                Console.WriteLine(user);
-            }
 
             var usersList = new SelectList(users, "Email", "Email");
             ViewBag.users = db.Users;
@@ -164,7 +160,6 @@ namespace PollingSystemTest_01.Controllers
         [HttpPost]
         public IActionResult CreateQuestion(string title, string question, string option1, string option2, string? option3, string? option4, string[] users)
         {
-            Console.WriteLine(users);
             string UserMail = User.Identity.Name;
             try
             {
@@ -184,8 +179,12 @@ namespace PollingSystemTest_01.Controllers
                     newQuestion.PollOptions.Add(Option4);
                     foreach(var userEmail in users)
                     {
-                        UsersSelected userSelected = new UsersSelected { UserEmail = userEmail };
+                        UsersSelected userSelected = new UsersSelected { UserEmail = userEmail, PollQuestionId = newQuestion.Id };
                         newQuestion.UsersSelected.Add(userSelected);
+                        db.UsersSelected.Add(userSelected);
+                        user.UsersSelected.Add(userSelected);
+                        Console.WriteLine("Email");
+                        Console.WriteLine(userEmail);
                     }
                     db.Questions.Add(newQuestion);
                     db.Options.Add(Option1);

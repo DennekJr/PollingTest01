@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PollingSystemTest_01.Data;
 
 namespace PollingSystemTest_01.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240106013638_addPollQuestionIdToUserSelectedTable")]
+    partial class addPollQuestionIdToUserSelectedTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -295,9 +297,6 @@ namespace PollingSystemTest_01.Data.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("ApplicationUserId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<int>("PollQuestionId")
                         .HasColumnType("int");
 
@@ -305,8 +304,6 @@ namespace PollingSystemTest_01.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ApplicationUserId");
 
                     b.HasIndex("PollQuestionId");
 
@@ -416,10 +413,6 @@ namespace PollingSystemTest_01.Data.Migrations
 
             modelBuilder.Entity("PollingSystemTest_01.Models.UsersSelected", b =>
                 {
-                    b.HasOne("PollingSystemTest_01.Models.ApplicationUser", null)
-                        .WithMany("UsersSelected")
-                        .HasForeignKey("ApplicationUserId");
-
                     b.HasOne("PollingSystemTest_01.Models.PollQuestion", null)
                         .WithMany("UsersSelected")
                         .HasForeignKey("PollQuestionId")
