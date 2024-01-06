@@ -10,6 +10,8 @@ using Microsoft.Extensions.Logging;
 using PollingSystemTest_01.Data;
 using PollingSystemTest_01.Models;
 using Microsoft.AspNetCore.Authentication.OAuth;
+using System.Collections.Generic;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace PollingSystemTest_01.Controllers
 {
@@ -144,13 +146,25 @@ namespace PollingSystemTest_01.Controllers
         [Authorize]
         public IActionResult CreateQuestion()
         {
+            var users = new List<string>();
+            foreach (var user in db.Users)
+            {
+                users.Add(user.Email);
+            }
+            foreach(var user in db.Users)
+            {
+                Console.WriteLine(user);
+            }
 
+            var usersList = new SelectList(users, "Email", "Email");
+            ViewBag.users = db.Users;
             return View();
         }
 
         [HttpPost]
-        public IActionResult CreateQuestion(string title, string question, string option1, string option2, string? option3, string? option4)
+        public IActionResult CreateQuestion(string title, string question, string option1, string option2, string? option3, string? option4, string[] users)
         {
+            Console.WriteLine(users);
             string UserMail = User.Identity.Name;
             try
             {
@@ -168,6 +182,11 @@ namespace PollingSystemTest_01.Controllers
                     newQuestion.PollOptions.Add(Option2);
                     newQuestion.PollOptions.Add(Option3);
                     newQuestion.PollOptions.Add(Option4);
+                    foreach(var userEmail in users)
+                    {
+                        UsersSelected userSelected = new UsersSelected { UserEmail = userEmail };
+                        newQuestion.UsersSelected.Add(userSelected);
+                    }
                     db.Questions.Add(newQuestion);
                     db.Options.Add(Option1);
                     db.Options.Add(Option2);
@@ -187,6 +206,7 @@ namespace PollingSystemTest_01.Controllers
                 return NotFound(ex.Message);
             }
             ViewBag.userMail = UserMail;
+            ViewBag.users = db.Users;
             return RedirectToAction("Index");
         }
 
@@ -218,12 +238,6 @@ namespace PollingSystemTest_01.Controllers
                 if (isVoted != null)
                 {
                     questionToDetail.disPlayPercentage = true;
-                    db.SaveChanges();
-                    return View(questionToDetail);
-                }
-                if (questionToDetail.VoteCount < 1)
-                {
-                    questionToDetail.VoteCount = 1;
                     db.SaveChanges();
                     return View(questionToDetail);
                 }

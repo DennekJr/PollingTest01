@@ -1,4 +1,6 @@
-﻿@model PollingSystemTest_01.Models.PollQuestion
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+@model PollingSystemTest_01.Models.PollQuestion
 
 @{
     ViewData["Title"] = "CreateQuestion";
@@ -29,6 +31,19 @@
                 <input name="option3" asp-for="PollOptions" class="form-control"></input>
                 <input name="option4" asp-for="PollOptions" class="form-control"></input>
                 <span asp-validation-for="PollOptions" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="UsersSelected" class="control-label">Select Users For Poll</label>
+                <select class="form-group" multiple="multiple" id="usersParticipating" name="UsersSelected">
+            @foreach (var user in @ViewBag.users)
+            {
+                if (User.Identity.Name != user.Email)
+                {
+                    <option value=@user.Email>@user.Email</option>
+
+                }
+            }
+        </select>
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />

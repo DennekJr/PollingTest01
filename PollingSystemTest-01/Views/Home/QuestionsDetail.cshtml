@@ -4,14 +4,14 @@
     ViewData["Title"] = "Questions Detail";
 }
 
-<h1>Questions Detail</h1>
+<h1>Question Detail</h1>
 
 <div>
     <h4>Question</h4>
     <hr />
     <dl class="row">
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.User.Email) : @Html.DisplayNameFor(model => model.User.UserName)
+            @Html.DisplayNameFor(model => model.User.UserName)
         </dt>
         <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Name)
@@ -50,10 +50,7 @@
                         <li>@t.Description</li>
                         @if (ViewBag.userId != @t.UserId)
                         {
-                            <li>Up: <span>@t.Votes.Where(t => t.Decision == true).Count()</span><a asp-action="VoteQOrA" asp-route-UAId="@t.Id">Vote Up</a></li>
-                            <li>
-                                Down: <span>@t.Votes.Where(t => t.Decision == false).Count()</span> <a asp-action="VoteQOrA" asp-route-DAId="@t.Id">Vote Down</a>
-                            </li>
+                            <li><a asp-action="VoteOption" asp-route-VOId="@t.Id">Vote</a></li>
                         }
 
 

@@ -42,4 +42,7 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="3.1.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Core" Version="3.1.0" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Remove="Models\UsersInPoll.json" />
+  </ItemGroup>
 </Project>

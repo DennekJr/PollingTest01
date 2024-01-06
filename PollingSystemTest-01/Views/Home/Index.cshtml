@@ -41,7 +41,7 @@
                     @Html.DisplayFor(modelItem => item.DOC)
                 </td>
                 <td>
-                    @item.PollOptions.Count()
+                    @item.PollOptions.Where(x => x.Description != null).Count()
                 </td>
                 <td style="display:flex; flex-direction: column">
                     @if (@item.PollOptions != null)

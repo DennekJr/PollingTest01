@@ -15,6 +15,7 @@ namespace PollingSystemTest_01.Models
 		public virtual ApplicationUser? User { get; set; }
 		public virtual ICollection<PollOption> PollOptions { get; set; }
 		public virtual ICollection<Vote>? Votes { get; set; }
+		public virtual ICollection<UsersSelected> UsersSelected { get; set; }
 
 		public DateTime DOC { get; set; }
 
@@ -23,6 +24,7 @@ namespace PollingSystemTest_01.Models
 		{
 			PollOptions = new HashSet<PollOption>();
 			Votes = new HashSet<Vote>();
+			UsersSelected = new HashSet<UsersSelected>();
 		}
 	}
 }
