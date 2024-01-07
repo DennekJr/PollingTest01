@@ -46,7 +46,14 @@
                     @Html.DisplayFor(modelItem => item.DOC)
                 </td>
                 <td>
-                    <a asp-action="QuestionsDetail" asp-route-qId="@item.Id">Take Poll</a>
+                    @if (@item.Votes.Where(x => x.User.Email == User.Identity.Name).Count() > 0 || User.IsInRole("Admin") == true)
+                    {
+                        <a asp-action="QuestionsDetail" asp-route-qId="@item.Id">View Poll</a>
+                    }
+                    else
+                    {
+                        <a asp-action="QuestionsDetail" asp-route-qId="@item.Id">Take Poll</a>
+                    }
                 </td>
                 <td>
                     @if (ViewBag.role != null)

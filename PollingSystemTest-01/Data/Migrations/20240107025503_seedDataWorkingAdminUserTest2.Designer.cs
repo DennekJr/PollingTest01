@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PollingSystemTest_01.Data;
 
 namespace PollingSystemTest_01.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240107025503_seedDataWorkingAdminUserTest2")]
+    partial class seedDataWorkingAdminUserTest2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -245,17 +247,17 @@ namespace PollingSystemTest_01.Data.Migrations
                         {
                             Id = "02174cf0–9412–4cfe-afbf-59f706d72cf6",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "5266dc2a-a63e-4261-8f7a-e8157c791c1d",
+                            ConcurrencyStamp = "2b44b257-5d56-4930-b6ad-7fd77abe7ade",
                             CorrectOptionCount = 0,
                             Email = "admin@gmail.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
-                            NormalizedEmail = "ADMIN@GMAIL.COM",
-                            NormalizedUserName = "ADMIN@GMAIL.COM",
-                            PasswordHash = "AQAAAAEAACcQAAAAEP0LrBqW56+LD7WpYYeJQQDFs70JwEgPERvX/+ArytVJhoZUjlQMTmjD4yCLXvizsA==",
+                            NormalizedEmail = "ADMIN@GMAIL@COM",
+                            NormalizedUserName = "ADMIN@GMAIL@COM",
+                            PasswordHash = "AQAAAAEAACcQAAAAEHmCfihUaYJ08bzpJbOKPJchfDo6M2n2D5YJE8G2J7eTmJKFBDYkms2uqpBSRU/CiQ==",
                             PhoneNumberConfirmed = false,
                             Role = "Admin",
-                            SecurityStamp = "a8d55bdd-b08e-4115-9029-484fd09d37a8",
+                            SecurityStamp = "fec50712-0d81-4702-9f2b-7cf00cbecd0f",
                             TwoFactorEnabled = false,
                             UserName = "admin@gmail.com"
                         });

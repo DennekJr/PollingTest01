@@ -33,61 +33,38 @@
         </dt>
         <dd class="col-sm-10">
             <ul>
-                @if (Model.VoteCount > 0)
+                @if (Model.PollOptions.Count() > 0)
                 {
-                    // Displays Most voted option for user who created the poll
-                    @foreach (var t in Model.PollOptions)
+                @foreach (var t in Model.PollOptions)
                     {
-                        if (ViewBag.userId == t.UserId)
+                        // Displays Most voted option for user who created the poll
+                        if (User.IsInRole("Admin") == true)
                         {
-                            if (t.MostVoted == true)
+                            if (ViewBag.largestOptionVote == t.PollOptionVoteCount)
                             {
-                                <li><span>Most Voted Answer</span>:&nbsp;@t.Description</li>
+                <li><span style="font-weight:bold">Most Voted Answer</span>:&nbsp;@t.Description</li>
+                <li><a asp-action="PublishVotes" asp-route-OId="@t.Id">Publish Result</a></li>
                             }
                         }
-
-                    }
-
-                    // Displays the option to vote for polls with activve votes and the current vote count per votes for the user whoo created the poll
-                    @foreach (var t in Model.PollOptions)
-                    {
-                        // Checking if it is not the poll creator who is currently logged in
-                        @if (ViewBag.userId != @t.UserId)
+                @if (@t.Description != null)
                         {
-                            // Display only description if user has voted already else add ability to vote
-                            if (Model.Votes.Where(x => x.User.Email == User.Identity.Name).Count() > 0)
+                @if (ViewBag.userId != @t.UserId)
                             {
-                                <li>@t.Description</li>
+                @if (Model.Votes.Where(x => x.User.Email == User.Identity.Name).Count() >= 1 || t.MostVoted == true)
+                                {
+                <li>@t.Description</li>
+                                }
+                                else
+                                {
+                <li>@t.Description - <a asp-action="VoteOption" asp-route-VOId="@t.Id">Vote</a></li>
+                                }
                             }
                             else
                             {
-                                <li>@t.Description - y<a asp-action="VoteOption" asp-route-VOId="@t.Id">Vote</a></li>
-                            }
-
-                        }
-                        else
-                        {
-                            <li>@t.Description - <span>@t.PollOptionVoteCount&nbsp;Votes</span></li>
-                        }
-                    }
-                }
-                else
-                {
-
-                    @foreach (var t in Model.PollOptions)
-                    {
-                        @if (@t.Description != null)
-                        {
-                            @if (ViewBag.userId != @t.UserId)
-                            {
-
-                                <li>@t.Description - other<a asp-action="VoteOption" asp-route-VOId="@t.Id">Vote</a></li>
-                            }
-                            else
-                            {
-                                <li>@t.Description</li>
+                <li>@t.Description - <span>@t.PollOptionVoteCount&nbsp;Votes</span></li>
                             }
                         }
+
                     }
                 }
             </ul>

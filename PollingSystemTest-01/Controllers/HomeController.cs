@@ -49,26 +49,18 @@ namespace PollingSystemTest_01.Controllers
 
                 switch (sortOrder)
                 {
-                    case "name_desc":
-                        questions = questions.OrderByDescending(s => s.Name);
-                        break;
                     case "Date":
                         questions = questions.OrderBy(s => s.DOC);
                         break;
                     case "date_desc":
                         questions = questions.OrderByDescending(s => s.DOC);
                         break;
-                    case "MostA":
-                        questions = questions.OrderByDescending(s => s.PollOptions.Count());
-                        break;
-                    case "LeastA":
-                        questions = questions.OrderByDescending(s => s.PollOptions.Count()).Reverse();
-                        break;
                     default:
                         questions = questions.OrderBy(s => s.Description.Length);
                         break;
                 }
-                return View(questions.ToList());
+
+                return user.Role == "Admin" ? View(db.Questions) : View(questions.ToList());
             }
 
             return View();
@@ -207,6 +199,9 @@ namespace PollingSystemTest_01.Controllers
             string userMail = User.Identity.Name;
             ApplicationUser user = db.Users.First(u => u.UserName == userMail);
             var largestOptionVote = questionToDetail.PollOptions.Max(x => x.PollOptionVoteCount);
+            Console.WriteLine("Largest vote");
+            Console.WriteLine(largestOptionVote);
+            Console.WriteLine(questionToDetail.Description);
             ViewBag.largestoptionVoted = largestOptionVote;
             ViewBag.userId = user.Id;
             ViewBag.question = questionToDetail;
@@ -280,6 +275,28 @@ namespace PollingSystemTest_01.Controllers
             }
             db.SaveChanges();
             return RedirectToAction("Index");
+        }
+
+        public IActionResult PublishVotes(int OId)
+        {
+            PollOption pollOption = db.Options.Include(v => v.Votes).First(x => x.Id == OId);
+
+            PollQuestion pollQuuestion = db.Questions.Include(x => x.PollOptions).ThenInclude(v => v.Votes).First(x => x.Id == pollOption.Id);
+            string userMail = User.Identity.Name;
+            ApplicationUser user = db.Users.First(u => u.UserName == userMail);
+            
+            try
+            {
+                pollOption.MostVoted = true;
+                pollQuuestion.disPlayPercentage = true;
+                db.SaveChanges();
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                return View(ex.Message);
+            }
+            return View();
         }
 
 
