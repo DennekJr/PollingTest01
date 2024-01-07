@@ -40,10 +40,10 @@ namespace PollingSystemTest_01.Controllers
             {
                 string userMail = User.Identity.Name;
                 ApplicationUser user = await _userManager.FindByEmailAsync(userMail);
-                ViewBag.CurrentUser = user;
+                ViewBag.CurrentUser = user.Email;
                 ViewBag.role = await _userManager.GetRolesAsync(user);
                 ViewBag.DateSortParm = sortOrder == "Date" ? "date_desc" : "Date";
-                var questions = from s in db.Questions.Where(x => x.UsersSelected.FirstOrDefault(u => u.UserEmail == user.Email) != null).Include(q => q.PollOptions).Include(v => v.Votes).Include(u => u.User)
+                var questions = from s in db.Questions.Where(x => x.UsersSelected.FirstOrDefault(u => u.UserEmail == user.Email) != null).Include(q => q.PollOptions).Include(v => v.Votes).ThenInclude(x => x.User).Include(u => u.User)
 
                                 select s;
 
@@ -59,7 +59,6 @@ namespace PollingSystemTest_01.Controllers
                         questions = questions.OrderBy(s => s.Description.Length);
                         break;
                 }
-
                 return user.Role == "Admin" ? View(db.Questions) : View(questions.ToList());
             }
 
@@ -78,24 +77,16 @@ namespace PollingSystemTest_01.Controllers
                 PollQuestion questionToDelete = db.Questions.First(q => q.Id == QId);
                 var votes = db.Votes.Include(x => x.PollOption).Include(q => q.PollQuestion);
                 var options = db.Options.Include(q => q.PollQuestionToAnswer);
-                foreach (var vote in votes)
+                foreach (var vote in questionToDelete.Votes)
                 {
-                    if (vote.PollOption.Id == questionToDelete.Id)
-                    {
-                        db.Votes.Remove(vote);
-                    }
+                    db.Votes.Remove(vote);
                 }
-                foreach (var option in options)
+                foreach (var option in questionToDelete.PollOptions)
                 {
-                    if (option.PollQuestionId == questionToDelete.Id)
-                    {
-                        db.Options.Remove(option);
-
-                    }
+                    db.Options.Remove(option);
                 }
                 db.Questions.Remove(questionToDelete);
-
-                ViewBag.CurrentUSer = user;
+                ViewBag.CurrentUSer = user.Email;
                 ViewBag.role = await _userManager.GetRolesAsync(user);
             }
 
@@ -195,16 +186,18 @@ namespace PollingSystemTest_01.Controllers
         public IActionResult QuestionsDetail(int qId)
         {
 
-            PollQuestion questionToDetail = db.Questions.Include(x => x.PollOptions).ThenInclude(v => v.Votes).First(x => x.Id == qId);
+            PollQuestion questionToDetail = db.Questions.Include(x => x.PollOptions).ThenInclude(v => v.Votes).Include(v => v.Votes).ThenInclude(x => x.User).First(x => x.Id == qId);
             string userMail = User.Identity.Name;
             ApplicationUser user = db.Users.First(u => u.UserName == userMail);
             var largestOptionVote = questionToDetail.PollOptions.Max(x => x.PollOptionVoteCount);
-            Console.WriteLine("Largest vote");
-            Console.WriteLine(largestOptionVote);
-            Console.WriteLine(questionToDetail.Description);
-            ViewBag.largestoptionVoted = largestOptionVote;
+            var mostVotedOptions = questionToDetail.PollOptions.Where(x => x.PollOptionVoteCount == largestOptionVote);
+            if(mostVotedOptions.Count() == 1)
+            {
+                ViewBag.mostvotedOption = mostVotedOptions.ElementAt(0);
+            }
+            ViewBag.publishedQuestion = questionToDetail.disPlayPercentage;
             ViewBag.userId = user.Id;
-            ViewBag.question = questionToDetail;
+            ViewBag.email = User.Identity.Name;
             return View(questionToDetail);
         }
 
@@ -224,7 +217,7 @@ namespace PollingSystemTest_01.Controllers
                 var isVoted = user.Votes.First(x => x.PollOptionId == option.Id);
                 if (isVoted != null)
                 {
-                    questionToDetail.disPlayPercentage = true;
+                    //questionToDetail.disPlayPercentage = true;
                     db.SaveChanges();
                     return View(questionToDetail);
                 }
@@ -266,8 +259,6 @@ namespace PollingSystemTest_01.Controllers
                             mostVotedOption.MostVoted = false;
                         }
                     }
-                    Console.WriteLine("Current Most Voted Option");
-                    Console.WriteLine(mostVotedOption.Description);
                     db.Votes.Add(newVote);
                     user.Votes.Add(newVote);
                 }
@@ -281,7 +272,7 @@ namespace PollingSystemTest_01.Controllers
         {
             PollOption pollOption = db.Options.Include(v => v.Votes).First(x => x.Id == OId);
 
-            PollQuestion pollQuuestion = db.Questions.Include(x => x.PollOptions).ThenInclude(v => v.Votes).First(x => x.Id == pollOption.Id);
+            PollQuestion pollQuuestion = db.Questions.Include(x => x.PollOptions).ThenInclude(v => v.Votes).First(x => x.Id == pollOption.PollQuestionId);
             string userMail = User.Identity.Name;
             ApplicationUser user = db.Users.First(u => u.UserName == userMail);
             

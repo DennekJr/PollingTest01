@@ -38,7 +38,7 @@
                 @foreach (var t in Model.PollOptions)
                     {
                         // Displays Most voted option for user who created the poll
-                        if (User.IsInRole("Admin") == true)
+                        if (User.IsInRole("Admin"))
                         {
                             if (ViewBag.largestOptionVote == t.PollOptionVoteCount)
                             {
@@ -50,7 +50,7 @@
                         {
                 @if (ViewBag.userId != @t.UserId)
                             {
-                @if (Model.Votes.Where(x => x.User.Email == User.Identity.Name).Count() >= 1 || t.MostVoted == true)
+                @if (Model.Votes.Where(x => x.User.Email == ViewBag.email).Count() > 0)
                                 {
                 <li>@t.Description</li>
                                 }
@@ -70,6 +70,25 @@
             </ul>
         </dd>
     </dl>
+</div>
+<div>
+    @if (User.IsInRole("Admin"))
+    @if(ViewBag.mostvotedOption != null){
+    <span style="font-weight:bold">Most Voted Answer - @ViewBag.mostvotedOption.Description </span>
+    <span>
+        @if(ViewBag.publishedQuestion){
+        <span>Results Published</span>
+    } else {
+        <a asp-action="PublishVotes" asp-route-OId="@ViewBag.mostvotedOption.Id">Publish Result</a>
+    }
+    </span>
+    } else {
+    <span style="font-weight:bold">Can't publish results withoout distinct winner</span>
+    } else {
+    @if(ViewBag.publishedQuestion){
+    <span style="font-weight:bold">Most Voted Answer - @ViewBag.mostvotedOption.Description </span>
+    }
+    }
 </div>
 <div>
     <a asp-action="Index">Back to List</a>

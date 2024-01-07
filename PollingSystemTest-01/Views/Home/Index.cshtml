@@ -26,14 +26,14 @@
                 <td>
                     Date Created
                 </td>
-                <td></td>
+                <td>Poll Result</td>
                 <td></td>
             </tr>
         </thead>
         <tbody>
             @foreach (var item in Model)
                 {
-                    @*if (item.UsersSelected.FirstOrDefault(x => x.UserEmail == @ViewBag.CurrentUser) != null)
+                    @*if (item.UsersSelected.FirstOrDefault(x => x.UserEmail == User.Identity.Name) != null)
                     {*@
             <tr>
                 <td>
@@ -46,7 +46,13 @@
                     @Html.DisplayFor(modelItem => item.DOC)
                 </td>
                 <td>
-                    @if (@item.Votes.Where(x => x.User.Email == User.Identity.Name).Count() > 0 || User.IsInRole("Admin") == true)
+                    @if (@item.disPlayPercentage)
+                    {
+                        <a asp-action="QuestionsDetail" asp-route-qId="@item.Id">Result</a>
+                    }
+                </td>
+                <td>
+                    @if (@item.Votes.Where(x => x.User.Email == @ViewBag.CurrentUser).Count() > 0 || User.IsInRole("Admin"))
                     {
                         <a asp-action="QuestionsDetail" asp-route-qId="@item.Id">View Poll</a>
                     }
@@ -57,18 +63,18 @@
                 </td>
                 <td>
                     @if (ViewBag.role != null)
-                        {
+                    {
                         <form asp-action="Index" method="Post">
                             @foreach (var itemRole in ViewBag.role)
-                                {
+                            {
                                 @if (itemRole == "Admin")
-                                    {
+                                {
                                     <button type="submit" asp-route-QId="@item.Id">Delete</button>
-                                    }
                                 }
+                            }
 
                         </form>
-                        }
+                    }
 
 
                 </td>
